@@ -71,4 +71,4 @@ jobs:
         # Need to add --access public to publish scoped package
         run: npm publish --access public --dry-run
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
