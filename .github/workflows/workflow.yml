@@ -36,10 +36,10 @@ jobs:
         run: |
           echo ${{ github.event.ref }}
           if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "release=true" >> "$GITHUB_OUTPUT"
+              echo "IS_RELEASE=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Debug tag
-        run: echo ${{ github.outputs.release }}
+        run: echo ${{ github.outputs.IS_RELEASE }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         if: ${{ github.event_name == 'tags' }}
