@@ -6,15 +6,15 @@
     "type": "git",
     "url": "https://github.com/SantaClaas/framework.git"
   },
-  "main": "dist/src/index.js",
-  "module": "dist/src/index.js",
+  "main": "./dist/src/index.js",
+  "module": "./dist/src/index.js",
   "exports": {
     ".": "./dist/src/index.js"
   },
   "files": [
-    "dist/src"
+    "./dist/src/"
   ],
-  "types": "dist/src/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "type": "module",
   "scripts": {
     "test": "vitest",
