@@ -56,16 +56,87 @@ export type Program<TArgument, TModel, TMessage, TView> = {
   // Is called when a message is dispatched
   readonly update: UpdateFunction<TModel, TMessage>;
   readonly view: ViewFunction<TModel, TMessage, TView>;
-  // Subscribe to changes to the applications state from outside of the application.
-  // The difference to dispatch is that these changes are not triggered by the application
+  /**
+   * Subscribe to changes that affect the application state from outside of the application.
+   * The difference to dispatch is that these changes are not triggered by the application.
+   * This function is called when the state of the application changes, whenever the model changes.
+   * That way the function can decide if it needs to start or stop a subscription.
+   * @param model
+   * @see https://elmish.github.io/elmish/#subscriptions
+   * @example
+   * // The message "tick" updates the model by adding 1 to the current value.
+   * const subscribe: SubscribeFunction<number, 'tick'> = model => {
+   *   // Stop tick when we reach 100 Seconds
+   *   if (model >= 100) return [];
+   *
+   *   return [
+   *     {
+   *       id: ['tick'],
+   *       start: dispatch => {
+   *         const id = setInterval(() => dispatch('tick'), 1_000);
+   *         return () => clearInterval(id);
+   *       },
+   *     },
+   *   ];
+   * };
+   *
+   * // Another exaple where we subscribe to a websocket after the state in model changes to signed in
+   * const subscribe: SubscribeFunction<Model, Message> = model => {
+   *   if (model.state !== 'signed in') return [];
+   *   return [
+   *     {
+   *       id: ['websocket'],
+   *       start: dispatch => {
+   *         const socket = new WebSocket('ws://localhost:8080');
+   *         socket.addEventListener('message', event => {
+   *           dispatch('websocket message', event.data);
+   *         });
+   *         return () => socket.close();
+   *       },
+   *     },
+   *   ];
+   * };
+   *
+   */
   readonly subscribe: SubscribeFunction<TModel, TMessage>;
-  // Need to research what these are again 😬
+  /**
+   * This function is called when the state of the application changes.
+   * It is normally used to update the UI, but can also be used to write to the console or log to a file if that is the desired side effect.
+   * @param model
+   * @param dispatch
+   * @see https://elmish.github.io/elmish/#view
+   * @example
+   * const view = (model, dispatch) => {
+   * return (
+   * <div>
+   * <button onClick={() => dispatch('increment')}>+</button>
+   * <span>{model}</span>
+   * <button onClick={() => dispatch('decrement')}>-</button>
+   * </div>
+   * )
+   * }
+   */
   readonly setState: SetStateFunction<TModel, TMessage>;
   // This was for error logging or something 🤔
   // The argument type is string*exception. Not sure what the string was. I assume a message?
   readonly onError: HandleErrorFunction;
-  // Not sure here either 😬
-  // Probably something related to the shutdown (https://elmish.github.io/elmish/#controlling-termination 👀❓)
+
+  /**
+   * This touple enables customization to control termination of the program.
+   * Termination is a tuple with two elements.
+   * The first element is a predicate that determines if the program should terminate.
+   * The second element is a function that is called when the program terminates.
+   * @example
+   * const program = withTermination(
+   *  message => message === 'terminate',
+   * model => console.log('Terminated with model: ', model),
+   * makeProgram(...)
+   * )
+   * @param predicate
+   * @param terminate
+   * @returns
+   * @see https://elmish.github.io/elmish/#controlling-termination
+   */
   readonly termination: Termination<TMessage, TModel>;
 };
 
