@@ -15,46 +15,46 @@ type Message<TModel, TPayload extends any[]> = (
   ...payload: TPayload
 ) => [TModel, Command<Message<TModel, TPayload>>];
 
-// Based on Function.apply
-// function dispatch1<
-//   TModel,
-//   TMessage,
-//   TArguments extends any[],
-//   TReturn extends [TModel, Command<TMessage>]
-// >(
-//   message: (model: TModel, ...args: TArguments) => TReturn,
-//   ...args: TArguments
+// // Based on Function.apply
+// // function dispatch1<
+// //   TModel,
+// //   TMessage,
+// //   TArguments extends any[],
+// //   TReturn extends [TModel, Command<TMessage>]
+// // >(
+// //   message: (model: TModel, ...args: TArguments) => TReturn,
+// //   ...args: TArguments
+// // ): void {}
+
+// function dispatch<TModel, TPayload extends any[]>(
+//   message: Message<TModel, TPayload>,
+//   ...payload: TPayload
 // ): void {}
 
-function dispatch<TModel, TPayload extends any[]>(
-  message: Message<TModel, TPayload>,
-  ...payload: TPayload
-): void {}
+// type SignInMessage = typeof setUsername | typeof setPassword;
 
-type SignInMessage = typeof setUsername | typeof setPassword;
+// function setUsername(
+//   model: SignInModel,
+//   name: string
+// ): [SignInModel, Command<SignInMessage>] {
+//   if (model.type !== "connected") return [model, command.none];
 
-function setUsername(
-  model: SignInModel,
-  name: string,
-): [SignInModel, Command<SignInMessage>] {
-  if (model.type !== 'connected') return [model, command.none];
+//   return [{ ...model, username: name }, command.none];
+// }
 
-  return [{ ...model, username: name }, command.none];
-}
+// function setPassword(
+//   model: SignInModel,
+//   password: string
+// ): [SignInModel, Command<SignInMessage>] {
+//   return [model, command.none];
+// }
 
-function setPassword(
-  model: SignInModel,
-  password: string,
-): [SignInModel, Command<SignInMessage>] {
-  return [model, command.none];
-}
+// // Assigning to variable just to proof the type works
+// const message1: Message<SignInModel, [string]> = setUsername;
+// const message1AsSpecific: SignInMessage = message1;
 
-// Assigning to variable just to proof the type works
-const message1: Message<SignInModel, [string]> = setUsername;
-const message1AsSpecific: SignInMessage = message1;
+// dispatch(message1, "name@example.com");
 
-dispatch(message1, 'name@example.com');
+// const message2: Message<SignInModel, [string]> = setPassword;
 
-const message2: Message<SignInModel, [string]> = setPassword;
-
-dispatch(message2, 'P4$$w0rd');
+// dispatch(message2, "P4$$w0rd");

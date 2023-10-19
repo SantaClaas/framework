@@ -21,7 +21,7 @@ export type InitializeFunction<TArgument, TModel, TMessage> = (
   argument: TArgument,
 ) => [TModel, Command<TMessage>];
 
-type UpdateFunction<TModel, TMessage> = (
+export type UpdateFunction<TModel, TMessage> = (
   message: TMessage,
   model: TModel,
 ) => [TModel, Command<TMessage>];
@@ -31,7 +31,7 @@ type ViewFunction<TModel, TMessage, TView> = (
   dispatch: Dispatch<TMessage>,
 ) => TView;
 
-type SubscribeFunction<TModel, TMessage> = (
+export type SubscribeFunction<TModel, TMessage> = (
   model: TModel,
 ) => NewSubscription<TMessage>[];
 
@@ -332,11 +332,11 @@ function runWithDispatch<TArgument, TModel, TMessage, TView>(
   argument: TArgument,
   program: Program<TArgument, TModel, TMessage, TView>,
 ) {
-  const [model, initialCommand] = program.initialize(argument);
-  const initialSubscription = program.subscribe(model);
+  const [initialModel, initialCommand] = program.initialize(argument);
+  const initialSubscription = program.subscribe(initialModel);
   const [isTerminationRequested, terminate] = program.termination;
   let activeSubscriptions: ActiveSubscription[] = [];
-  let currentState: TModel = model;
+  let currentState: TModel = initialModel;
 
   // Messages need to be processes in the order they arrived (First In, First Out)
   const messageQueue: TMessage[] = [];
@@ -349,9 +349,10 @@ function runWithDispatch<TArgument, TModel, TMessage, TView>(
   const processMessages = () => {
     let nextMessage = messageQueue.shift();
 
-    // Stop loop in case of termination
+    // Stop loop in case of termination or no more messages
     while (!isTerminated && nextMessage !== undefined) {
-      if (isTerminationRequested(nextMessage)) {
+      isTerminated = isTerminationRequested(nextMessage);
+      if (isTerminated) {
         stopSubscriptions(program.onError, activeSubscriptions);
         terminate(currentState);
         // Break out of processing
@@ -401,7 +402,7 @@ function runWithDispatch<TArgument, TModel, TMessage, TView>(
   // and provide users a way to update the state
   // to start processing messages if there are new one as long as we are not terminated
   function dispatch(message: TMessage) {
-    // Break loop
+    // Don't add more messages to process and break loop
     if (isTerminated) return;
 
     // Enqueue messages to be processed
@@ -417,7 +418,7 @@ function runWithDispatch<TArgument, TModel, TMessage, TView>(
   // First start of loop
   isProcessingMessages = true;
   // Set state normally triggers the first render here
-  program.setState(model, dispatch);
+  program.setState(initialModel, dispatch);
   command.execute(
     error => program.onError(`Error initialzing`, error),
     dispatch,
