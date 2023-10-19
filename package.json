@@ -1,6 +1,6 @@
 {
   "name": "framework",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "My favorite way to manage state in apps. Inspired by other elm like frameworks",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
