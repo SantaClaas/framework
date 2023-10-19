@@ -10,6 +10,11 @@ on:
       # Publish npm package when a new tag is pushed
       - '*.*.*'
 
+# Allow one concurrent deployment
+concurrency:
+  group: 'workflow'
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,6 +33,8 @@ jobs:
       - run: npm run build
       - name: Debug tag
         run: echo ${{ github.event_name }}
+      - name: Debug tag 2
+        run: echo ${{ github.event_name == 'tags' }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         if: ${{ github.event_name == 'tags' }}
