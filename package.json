@@ -1,6 +1,6 @@
 {
   "name": "@claas.dev/framework",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "My favorite way to manage state in apps. Inspired by other elm like frameworks",
   "repository": {
     "type": "git",
