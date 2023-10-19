@@ -26,6 +26,8 @@ jobs:
       # Test does not require build in this case
       - run: npm test
       - run: npm run build
+      - name: Debug tag
+        run: echo ${{ github.event_name }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         if: ${{ github.event_name == 'tags' }}
