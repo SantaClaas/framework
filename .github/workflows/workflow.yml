@@ -31,10 +31,14 @@ jobs:
       # Test does not require build in this case
       - run: npm test
       - run: npm run build
+      - name: Check if tag is release tag
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "is_release=true" >> $GITHUB_OUTPUT
+          fi
       - name: Debug tag
-        run: echo ${{ github.event_name }}
-      - name: Debug tag 2
-        run: echo ${{ github.event_name == 'tags' }}
+        run: echo ${{ github.outputs.is_release }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         if: ${{ github.event_name == 'tags' }}
