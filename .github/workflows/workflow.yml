@@ -18,6 +18,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      IS_RELEASE: ${{ steps.check-tag.outputs.IS_RELEASE }}
 
     steps:
       - name: Checkout
@@ -37,12 +39,14 @@ jobs:
           echo ${{ github.event.ref }}
           if [[ ${{ github.event.ref }} =~ ^refs/tags/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "IS_RELEASE=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "IS_RELEASE=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Debug tag
         run: echo ${{ steps.check-tag.outputs.IS_RELEASE }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
-        if: ${{ github.event_name == 'tags' }}
+        if: ${{ steps.check-tag.outputs.IS_RELEASE == 'true' }}
         with:
           name: npm-package-files
           # Files always included and from paclage.json
@@ -55,8 +59,8 @@ jobs:
 
   publish-npm:
     # Only publish when a release tag is pushed
-    if: ${{ github.event_name == 'tags' }}
     needs: build
+    if: ${{ needs.build.outputs.IS_RELEASE == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifacts
