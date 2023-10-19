@@ -1,0 +1,56 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Test, Build, Publish
+
+on:
+  push:
+    branches: ['main']
+    tags:
+      # Publish npm package when a new tag is pushed
+      - '*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21.x'
+          cache: 'npm'
+      - run: npm ci
+      # Test does not require build in this case
+      - run: npm test
+      - run: npm run build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'tags' }}
+        with:
+          name: npm-package-files
+          # Files always included and from paclage.json
+          # See https://docs.npmjs.com/cli/v10/configuring-npm/package-json#files
+          path: |
+            package.json
+            README.md
+            LICENSE
+            dist
+
+  publish-npm:
+    # Only publish when a release tag is pushed
+    if: ${{ github.event_name == 'tags' }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: npm-package-files
+      - name: Publish artifacts to npm
+        # Need to add --access public to publish scoped package
+        run: npm publish --access public --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
