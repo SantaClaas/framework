@@ -42,8 +42,6 @@ jobs:
           else
               echo "IS_RELEASE=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Debug tag
-        run: echo ${{ steps.check-tag.outputs.IS_RELEASE }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         if: ${{ steps.check-tag.outputs.IS_RELEASE == 'true' }}
@@ -71,6 +69,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: npm-package-files
+      - name: Bump version
+        # Bump ephemeral version based on git tag which we previously confirmed to be set
+        run: npm --no-git-tag-version version from-git
       - name: Publish artifacts to npm
         # Need to add --access public to publish scoped package
         run: npm publish --access public
