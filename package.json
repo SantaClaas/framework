@@ -18,7 +18,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "npm run build -- --watch"
   },
   "author": "Claas",
   "license": "Apache-2.0",
