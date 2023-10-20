@@ -23,9 +23,9 @@ export const none = [];
 export function execute<TMessage>(
   onError: (error: unknown) => void,
   dispatch: Dispatch<TMessage>,
-  command: Command<TMessage>
+  command: Command<TMessage>,
 ) {
-  command.forEach((call) => {
+  command.forEach(call => {
     try {
       call(dispatch);
     } catch (error: unknown) {
@@ -36,7 +36,7 @@ export function execute<TMessage>(
 
 export function map<TMessageA, TMessageB>(
   mapper: (message: TMessageA) => TMessageB,
-  command: Command<TMessageA>
+  command: Command<TMessageA>,
 ): Command<TMessageB> {
   // I'm sorry this is a bit harder to read. If you find a solution that is easier to read and maps one message type to
   // the other please contribute
@@ -55,7 +55,7 @@ export function map<TMessageA, TMessageB>(
  * Aggregate multiple commands
  */
 export function batch<TMessage>(
-  commands: Iterable<Command<TMessage>>
+  commands: Iterable<Command<TMessage>>,
 ): Command<TMessage> {
   return Array.from(commands).flat();
 }
@@ -64,7 +64,7 @@ export function batch<TMessage>(
  * Command to call the effect
  */
 export function ofEffect<TMessage>(
-  effect: Effect<TMessage>
+  effect: Effect<TMessage>,
 ): Command<TMessage> {
   return [effect];
 }
@@ -78,7 +78,7 @@ export const ofFunction = {
     task: (argument: TArgument) => TResult,
     argument: TArgument,
     ofSuccess: (result: TResult) => TMessage,
-    ofError: (error: unknown) => TMessage
+    ofError: (error: unknown) => TMessage,
   ): Command<TMessage> {
     function bind(dispatch: Dispatch<TMessage>) {
       try {
@@ -101,7 +101,7 @@ export const ofFunction = {
   perform<TArgument, TResult, TMessage>(
     task: (argument: TArgument) => TResult,
     argument: TArgument,
-    ofSuccess: (result: TResult) => TMessage
+    ofSuccess: (result: TResult) => TMessage,
   ): Command<TMessage> {
     function bind(dispatch: Dispatch<TMessage>) {
       try {
@@ -122,7 +122,7 @@ export const ofFunction = {
   attempt<TArgument, TMessage>(
     task: (argument: TArgument) => void,
     argument: TArgument,
-    ofError: (error: unknown) => TMessage
+    ofError: (error: unknown) => TMessage,
   ): Command<TMessage> {
     function bind(dispatch: Dispatch<TMessage>) {
       try {
@@ -148,7 +148,7 @@ export const ofPromise = {
     task: (argument: TArgument) => Promise<TResult>,
     argument: TArgument,
     ofSuccess: (result: TResult) => TMessage,
-    ofError: (error: unknown) => TMessage
+    ofError: (error: unknown) => TMessage,
   ): Command<TMessage> {
     async function bind(dispatch: Dispatch<TMessage>): Promise<void> {
       try {
@@ -170,7 +170,7 @@ export const ofPromise = {
   perform<TArgument, TResult, TMessage>(
     task: (argument: TArgument) => Promise<TResult>,
     argument: TArgument,
-    ofSuccess: (result: TResult) => TMessage
+    ofSuccess: (result: TResult) => TMessage,
   ): Command<TMessage> {
     async function bind(dispatch: Dispatch<TMessage>): Promise<void> {
       try {
@@ -179,7 +179,7 @@ export const ofPromise = {
         dispatch(message);
       } catch (e) {
         // Ignored
-        console.error("Ignored error:", e);
+        console.error('Ignored error:', e);
       }
     }
 
@@ -193,7 +193,7 @@ export const ofPromise = {
   attempt<TArgument, TMessage>(
     task: (argument: TArgument) => Promise<void>,
     argument: TArgument,
-    ofError: (error: unknown) => TMessage
+    ofError: (error: unknown) => TMessage,
   ): Command<TMessage> {
     async function bind(dispatch: Dispatch<TMessage>): Promise<void> {
       try {
