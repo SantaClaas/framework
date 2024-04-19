@@ -47,7 +47,7 @@ jobs:
         if: ${{ steps.check-tag.outputs.IS_RELEASE == 'true' }}
         with:
           name: npm-package-files
-          # Files always included and from paclage.json
+          # Files always included and from package.json
           # See https://docs.npmjs.com/cli/v10/configuring-npm/package-json#files
           path: |
             package.json
